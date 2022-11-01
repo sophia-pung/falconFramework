@@ -1,144 +1,89 @@
-import { Graphviz } from 'graphviz-react';
-import React from 'react'; 
-import './graphVis.css';
+import Graph from "react-graph-vis";
+import React, { useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
-let happiness = "happiness2";
+const options = {
+  layout: {
+    hierarchical: false
+  },
+  edges: {
+    color: "#000000"
+  }
+};
 
-const GraphvizPage = () => {
-  const dot = `
-    graph happiness {
-	fontname="URW Chancery L, Apple Chancery, Comic Sans MS, cursive"
-	layout=twopi; graph [ranksep=2];
-	edge [penwidth=5 color="#f0f0ff"]
-	node [fontname="URW Chancery L, Apple Chancery, Comic Sans MS, cursive"]
-	node [shape=circle style="filled" penwidth=0 fillcolor="#f0f0ffA0" fontcolor=indigo]
-	${happiness} [fontsize=20 fontcolor=red URL="https://en.wikipedia.org/wiki/Category:Happiness"]
-	node [fontsize=20]
-	${happiness} -- {
-		Peace
-		Love
-		Soul
-		Mind
-		Life
-		Health
-	}
-	Life [fontcolor=seagreen]
-	Health [fontcolor=mediumvioletred]
-	node [fontsize=25]
-	Love [fontcolor=orchid URL="https://en.wikipedia.org/wiki/Category:Love"]
-	Love -- {
-		Giving
-		People
-		Beauty
-	}
-	Success [fontcolor=goldenrod]
-	Life -- {
-		Nature
-		Wellbeing
-		Success
-	}
-	Peace [URL="https://en.wikipedia.org/wiki/Category:Peace"]
-	Peace -- {
-		Connection
-		Relationship
-		Caring
-	}
-	Health -- {
-		Body
-		Recreation
-	}
-	Mind [URL="https://en.wikipedia.org/wiki/Category:Mind"]
-	Mind -- {
-		Cognition
-		Consciousness
-		Intelligence
-	}
-	Soul [URL="https://en.wikipedia.org/wiki/Soul"]
-	Soul -- {
-		Emotions
-		Self
-		Meditation
-	}
-	node [fontsize=""]
-	Beauty -- {
-		Esthetics
-		Art
-	}
-	People -- {
-		Family
-		Partner
-		Hug
-	}
-	Giving -- {
-		Feelings
-		Support
-	}
-	Self -- {
-		Delight
-		Joy
-		Expression 
-	}
-	Success -- {
-		Creation
-		Profit
-		Win
-		Career
-	}
-	Recreation -- {
-		Leisure
-		Sleep
-	}
-	Emotions [URL="https://en.wikipedia.org/wiki/Soul"]
-	Emotions -- {
-		Positiveness Tranquility
-	}
-	Self -- Emotions [weight=10 penwidth=1 style=dotted constraint=false]
-	Body -- {
-		Medicine Exercises Nutrition Water Heart
-	}
-	Wellbeing -- {
-		Home Work Finance Clothes Transport
-	}
-	Relationship -- {
-		Friends Community Society
-	}
-	Connection -- {
-		Acceptance
-		Forgiveness
-		Gratitude
-		Agreement
-	}
-	Caring -- {
-		Respect
-		Empathy
-		Help
-	}
-	Consciousness -- {
-		Awareness
-	}
-	Meditation -- {
-		Contemplation Breath
-	}
-	Cognition -- {
-		Imagination
-		Perception
-		Thinking
-		Understanding
-		Memory
-	}
-	Intelligence -- {
-		Learning
-		Experiment
-		Education
-	}
-	Nature -- {
-		Ocean
-		Forest
-		Pets
-		Wildlife
-	}
-}`;
-  return <Graphviz className="bob" dot={dot} />;
+function randomColor() {
+  const red = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+  const green = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+  const blue = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+  return `#${red}${green}${blue}`;
 }
 
-export default GraphvizPage;
+const GraphvisPage = () => {
+  const createNode = (x, y) => {
+    const color = randomColor();
+    setState(({ graph: { nodes, edges }, counter, ...rest }) => {
+      const id = counter + 1;
+      const from = 3//Math.floor(Math.random() * (counter - 1)) + 1;
+      const newNodes = [
+        ...nodes,
+        { id, label: `Node ${id}`, color, x, y }
+      ];
+      console.log(counter, nodes.length, id)
+      console.log(nodes, newNodes)
+      console.log(x, y)
+      return {
+        graph: {
+          nodes: newNodes,
+          edges: [
+            ...edges,
+            { from, to: id }
+          ]
+        },
+        counter: id,
+        ...rest
+      }
+    });
+  }
+  const [state, setState] = useState({
+    counter: 5,
+    graph: {
+      nodes: [
+        { id: 1, label: "Node 1", color: "#e04141" },
+        { id: 2, label: "Node 2", color: "#e09c41" },
+        { id: 3, label: "Node 3", color: "#e0df41" },
+        { id: 4, label: "Node 4", color: "#7be041" },
+        { id: 5, label: "Node 5", color: "#41e0c9" }
+      ],
+      edges: [
+        { from: 1, to: 2 },
+        { from: 1, to: 3 },
+        { from: 2, to: 4 },
+        { from: 2, to: 5 }
+      ]
+    },
+    events: {
+      select: ({ nodes, edges }) => {
+        console.log("Selected nodes:");
+        console.log(nodes);
+        console.log("Selected edges:");
+        console.log(edges);
+        alert("Selected node: " + nodes);
+      },
+      doubleClick: ({ pointer: { canvas } }) => {
+        createNode(canvas.x, canvas.y);
+      }
+    }
+  })
+  const { graph, events } = state;
+  //the key is a workaround for react strict mode
+  //uuidv4 generates a unique string everytime the react component is rendered
+  const key = uuidv4();
+  return (
+    <div>
+      <Graph key={key} graph={graph} options={options} events={events} style={{ height: "640px" }} />
+    </div>
+  );
+
+}
+
+export default GraphvisPage;

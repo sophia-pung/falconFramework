@@ -8,6 +8,29 @@ const options = {
   },
   edges: {
     color: "#000000"
+  },
+  layout: {
+    randomSeed: 23,
+  },
+  physics: {
+    hierarchicalRepulsion: {
+      centralGravity: 100,
+      springLength: 200,
+      springConstant: 0.1,
+      nodeDistance: 150,
+      damping: 1
+    },
+    maxVelocity: 500,
+    minVelocity: 3,
+    solver: "barnesHut",
+    stabilization: {
+      enabled: true,
+      iterations: 1000,
+      updateInterval: 100,
+      onlyDynamicEdges: false,
+      fit: true
+    },
+    timestep: 0.5
   }
 };
 
@@ -48,8 +71,9 @@ const GraphvisPage = () => {
     counter: 5,
     graph: {
       nodes: [
-        { id: 1, label: "Node 1", color: "#e04141" },
-        { id: 2, label: "Node 2", color: "#e09c41" },
+        { id: 1, label: "", color: "#e04141", shape: 'image',
+        image: 'https://resources.finalsite.net/images/f_auto,q_auto,t_image_size_1/v1587726922/rdaleorg/ekdtpkytkyr90pidagnp/ArmstrongHS-C.png'},
+        { id: 2, label: "", shape: 'image', image: 'https://coursereport-s3-production.global.ssl.fastly.net/uploads/school/logo/506/original/techtonica-image-logo.png'},
         { id: 3, label: "Node 3", color: "#e0df41" },
         { id: 4, label: "Node 4", color: "#7be041" },
         { id: 5, label: "Node 5", color: "#41e0c9" }
@@ -79,7 +103,7 @@ const GraphvisPage = () => {
   //uuidv4 generates a unique string everytime the react component is rendered
   const key = uuidv4();
   return (
-    <div>
+    <div>c
       <Graph key={key} graph={graph} options={options} events={events} style={{ height: "640px" }} />
     </div>
   );
